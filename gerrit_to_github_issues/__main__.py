@@ -1,58 +1,64 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+# distributed under the License is distributed on an 'AS IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import argparse
 import logging
-import re
-import sys
+import os
 
-import github
+import errors
+from engine import update
 
-GH_USER = sys.argv[1]
-GH_PW = sys.argv[2]
-ZUUL_MESSAGE = sys.argv[3]
-GERRIT_URL = sys.argv[4]
-REPO_NAME = 'airshipit/airshipctl'
+LOG_FORMAT = '%(asctime)s %(levelname)-8s %(name)s:' \
+             '%(funcName)s [%(lineno)3d] %(message)s'  # noqa
+
+LOG = logging.getLogger(__name__)
+
+
+def validate(namespace: argparse.Namespace):
+    arg_dict = vars(namespace)
+    if not ((arg_dict['github_username'] and arg_dict['github_password']) or arg_dict['github_token']):
+        raise errors.GithubConfigurationError
+    return arg_dict
+
 
 if __name__ == '__main__':
-    issue_number = re.search(r'(?<=\[#)(.*?)(?=\])', ZUUL_MESSAGE).group(0)
-    gh = github.Github(GH_USER, GH_PW)
-    repo = gh.get_repo(REPO_NAME)
-    issue = repo.get_issue(number=int(issue_number))
-    comment_msg = ''
-    link_exists = False
-    for comment in issue.get_comments():
-        if GERRIT_URL in comment.body:
-            logging.log(logging.INFO, 'Gerrit link has already been posted')
-            link_exists = True
-    if issue.state == 'closed' and not link_exists:
-        issue.edit(state='open')
-        comment_msg += 'Issue reopened due to new activity on Gerrit.\n\n'
-    if 'WIP' in ZUUL_MESSAGE.upper() or 'DNM' in ZUUL_MESSAGE.upper():
-        logging.log(logging.INFO, 'Changing status with `wip` label')
-        issue.add_to_labels('wip')
-        try:
-            issue.remove_from_labels('ready for review')
-        except github.GithubException:
-            logging.log(logging.DEBUG, 'Could not remove `ready for review` label, '
-                                       'it probably was not on the issue')
-    else:
-        logging.log(logging.INFO, 'Changing status with `ready for review` label')
-        issue.add_to_labels('ready for review')
-        try:
-            issue.remove_from_labels('wip')
-        except github.GithubException:
-            logging.log(logging.DEBUG, 'Could not remove `wip` label, '
-                                       'it probably was not on the issue')
-    if not link_exists:
-        comment_msg += f'New Related Change: {GERRIT_URL}'
-    if comment_msg:
-        issue.create_comment(comment_msg)
-        logging.log(logging.INFO, f'Comment posted to issue #{issue_number}')
+    parser = argparse.ArgumentParser(
+        prog='gerrit-to-github-issues',
+        usage='synchronizes GitHub Issues with new changes found in Gerrit',
+        description='This script evaluates the following logic on open changes from Gerrit:\n'
+                    '1. Check for and extract an issue tag (i.e. "[#3]") from the open change\'s commit message.\n'
+                    '2. Check associated Github Issue for a link to the change. If no such link exists, comment it.\n'
+                    '3. If the associated issue was closed, re-open it and comment on it describing why it was '
+                    're-opened and a link to the Gerrit change that was found.\n'
+                    '4. If the Gerrit change\'s commit message contains a "WIP" or "DNM" tag, add the "wip" label and '
+                    'to the issue remove other process labels such as "ready for review".\n'
+                    '5. If no "WIP" or "DNM" tag is found in the change\'s commit message, add the "ready for review" '
+                    'label to the issue and remove other process labels such as "ready for review".'
+    )
+    parser.add_argument('-g', '--gerrit-url', action='store', required=True, type=str,
+                        default=os.getenv('GERRIT_URL', default=None), help='Target Gerrit URL.')
+    parser.add_argument('-u', '--github-username', action='store', required=False, type=str,
+                        default=os.getenv('GITHUB_USER', default=None),
+                        help='Username to use for GitHub Issues integration. Defaults to GITHUB_USER in '
+                             'environmental variables. Must be used with a password.')
+    parser.add_argument('-p', '--github-password', action='store', required=False, type=str,
+                        default=os.getenv('GITHUB_PW', default=None),
+                        help='Password to use for GitHub Issues integration. Defaults to GITHUB_PW in '
+                             'environmental variables. Must be used with a username.')
+    parser.add_argument('-t', '--github-token', action='store', required=False, type=str,
+                        default=os.getenv('GITHUB_TOKEN', default=None),
+                        help='Token to use for GitHub Issues integration. Defaults to GITHUB_TOKEN in '
+                             'environmental variables. This will be preferred over a username/password.')
+    parser.add_argument('gerrit_project_name', action='store', type=str, help='Target Gerrit project.')
+    parser.add_argument('github_project_name', action='store', type=str, help='Target Github project.')
+    ns = parser.parse_args()
+    args = validate(ns)
+    update(**args)
