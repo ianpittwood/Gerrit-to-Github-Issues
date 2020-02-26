@@ -14,7 +14,7 @@ import json
 from fabric import Connection
 
 
-def get_changes(gerrit_url: str, project_name: str, port: int = 29418) -> list:
+def get_changes(gerrit_url: str, project_name: str, port: int = 29418) -> dict:
     cmd = f'gerrit query --format=JSON status:open project:{project_name}'
     result = Connection(gerrit_url, port=port).run(cmd)
     processed_stdout = '{"data":[%s]}' % ','.join(list(filter(None, result.stdout.split('\n'))))

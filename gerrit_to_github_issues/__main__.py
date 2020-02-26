@@ -24,7 +24,7 @@ LOG = logging.getLogger(__name__)
 
 def validate(namespace: argparse.Namespace):
     arg_dict = vars(namespace)
-    if not ((arg_dict['github_username'] and arg_dict['github_password']) or arg_dict['github_token']):
+    if not ((arg_dict['github_user'] and arg_dict['github_password']) or arg_dict['github_token']):
         raise errors.GithubConfigurationError
     return arg_dict
 
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     )
     parser.add_argument('-g', '--gerrit-url', action='store', required=True, type=str,
                         default=os.getenv('GERRIT_URL', default=None), help='Target Gerrit URL.')
-    parser.add_argument('-u', '--github-username', action='store', required=False, type=str,
+    parser.add_argument('-u', '--github-user', action='store', required=False, type=str,
                         default=os.getenv('GITHUB_USER', default=None),
                         help='Username to use for GitHub Issues integration. Defaults to GITHUB_USER in '
                              'environmental variables. Must be used with a password.')
@@ -57,8 +57,15 @@ if __name__ == '__main__':
                         default=os.getenv('GITHUB_TOKEN', default=None),
                         help='Token to use for GitHub Issues integration. Defaults to GITHUB_TOKEN in '
                              'environmental variables. This will be preferred over a username/password.')
+    parser.add_argument('-v', '--verbose', action='store_true', required=False,
+                        default=False, help='Enabled DEBUG level logging.')
     parser.add_argument('gerrit_project_name', action='store', type=str, help='Target Gerrit project.')
     parser.add_argument('github_project_name', action='store', type=str, help='Target Github project.')
     ns = parser.parse_args()
     args = validate(ns)
+    if args['verbose']:
+        logging.basicConfig(format=LOG_FORMAT, level=logging.DEBUG)
+    else:
+        logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)
+    args.pop('verbose')
     update(**args)
