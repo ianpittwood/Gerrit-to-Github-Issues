@@ -12,6 +12,7 @@
 import argparse
 import logging
 import os
+import sys
 
 from gerrit_to_github_issues import errors
 from gerrit_to_github_issues.engine import update
@@ -60,17 +61,23 @@ def main():
                              'environmental variables. This will be preferred over a username/password.')
     parser.add_argument('-v', '--verbose', action='store_true', required=False,
                         default=False, help='Enabled DEBUG level logging.')
+    parser.add_argument('--log-file', action='store', required=False, type=str,
+                        help='Specifies a file to output logs to. Defaults to `sys.stdout`.')
     parser.add_argument('gerrit_project_name', action='store', type=str, help='Target Gerrit project.')
     parser.add_argument('github_project_name', action='store', type=str, help='Target Github project.')
     ns = parser.parse_args()
     args = validate(ns)
-    if args['verbose']:
-        logging.basicConfig(format=LOG_FORMAT, level=logging.DEBUG)
+    verbose = args.pop('verbose')
+    log_file = args.pop('log_file')
+    log_settings = {
+        'format': LOG_FORMAT,
+    }
+    if verbose:
+        log_settings['level'] = logging.DEBUG
     else:
-        logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)
-    args.pop('verbose')
+        log_settings['level'] = logging.INFO
+    if log_file:
+        log_settings['filename'] = log_file
+    else:
+        log_settings['stream'] = sys.stdout
     update(**args)
-
-
-if __name__ == '__main__':
-    main()
