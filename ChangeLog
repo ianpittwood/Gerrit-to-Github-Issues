@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* Fix closes message to only be printed on new related changes
 * Finalize changes for 0.0.1 build
 * Prepare project for packaging
 * Implement Relates-To and Closes tagging
