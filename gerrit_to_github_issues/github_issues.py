@@ -9,6 +9,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 import re
 
 import github
@@ -17,12 +18,40 @@ from github.Repository import Repository
 
 import errors
 
+LOG = logging.getLogger(__name__)
 
-def parse_issue_number(commit_msg: str) -> int:
-    match = re.search(r'(?<=\[#)(.*?)(?=\])', commit_msg)
-    if not match:
-        return None
-    return int(match.group(0))
+
+def construct_issue_list(match_list: list) -> list:
+    new_list = []
+    for issue in match_list:
+        try:
+            new_list.append(int(issue))
+        except ValueError:
+            LOG.warning(f'Value {issue} could not be converted to `int` type')
+    return new_list
+
+
+def parse_issue_number(commit_msg: str) -> dict:
+    # Searches for Relates-To or Closes tags first to match and return
+    LOG.debug(f'Parsing commit message: {commit_msg}')
+    related = re.findall(r'(?<=Relates-To: #)(.*?)(?=\n)', commit_msg)
+    LOG.debug(f'Captured related issues: {related}')
+    closes = re.findall(r'(?<=Closes: #)(.*?)(?=\n)', commit_msg)
+    LOG.debug(f'Captured closes issues: {closes}')
+    if related or closes:
+        return {
+            'related': construct_issue_list(related),
+            'closes': construct_issue_list(closes)
+        }
+    # If no Relates-To or Closes tags are defined, find legacy [#X] style tags
+    LOG.debug('Falling back to legacy tags')
+    legacy_matches = re.findall(r'(?<=\[#)(.*?)(?=\])', commit_msg)
+    LOG.debug(f'Captured legacy issues: {legacy_matches}')
+    if not legacy_matches:
+        return {}
+    return {
+        'related': construct_issue_list(legacy_matches)
+    }
 
 
 def get_repo(repo_name: str, github_user: str, github_pw: str, github_token: str) -> Repository:
