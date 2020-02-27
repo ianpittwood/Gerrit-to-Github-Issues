@@ -14,8 +14,8 @@ import logging
 import github
 from github.Repository import Repository
 
-import gerrit
-import github_issues
+from gerrit_to_github_issues import gerrit
+from gerrit_to_github_issues import github_issues
 
 LOG = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ def process_change(change: dict, repo: Repository, gerrit_url: str):
                 LOG.debug(f'Issue #{issue_number} was closed, reopening...')
                 #issue.edit(state='open')
                 #issue.create_comment('Issue reopened due to new activity on Gerrit.\n\n')
-            labels = issue.get_labels()
+            labels = [str(l.name) for l in list(issue.get_labels())]
             if 'WIP' in change['commitMessage'] or 'DNM' in change['commitMessage']:
                 if 'wip' not in labels:
                     LOG.debug(f'add `wip` to #{issue_number}')

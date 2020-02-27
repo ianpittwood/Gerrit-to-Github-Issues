@@ -16,7 +16,7 @@ import github
 from github.Issue import Issue
 from github.Repository import Repository
 
-import errors
+from gerrit_to_github_issues import errors
 
 LOG = logging.getLogger(__name__)
 

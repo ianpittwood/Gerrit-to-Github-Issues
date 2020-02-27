@@ -13,8 +13,8 @@ import argparse
 import logging
 import os
 
-import errors
-from engine import update
+from gerrit_to_github_issues import errors
+from gerrit_to_github_issues.engine import update
 
 LOG_FORMAT = '%(asctime)s %(levelname)-8s %(name)s:' \
              '%(funcName)s [%(lineno)3d] %(message)s'  # noqa
@@ -29,7 +29,7 @@ def validate(namespace: argparse.Namespace):
     return arg_dict
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(
         prog='gerrit-to-github-issues',
         usage='synchronizes GitHub Issues with new changes found in Gerrit',
@@ -41,7 +41,8 @@ if __name__ == '__main__':
                     '4. If the Gerrit change\'s commit message contains a "WIP" or "DNM" tag, add the "wip" label and '
                     'to the issue remove other process labels such as "ready for review".\n'
                     '5. If no "WIP" or "DNM" tag is found in the change\'s commit message, add the "ready for review" '
-                    'label to the issue and remove other process labels such as "ready for review".'
+                    'label to the issue and remove other process labels such as "ready for review".',
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument('-g', '--gerrit-url', action='store', required=True, type=str,
                         default=os.getenv('GERRIT_URL', default=None), help='Target Gerrit URL.')
@@ -69,3 +70,7 @@ if __name__ == '__main__':
         logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)
     args.pop('verbose')
     update(**args)
+
+
+if __name__ == '__main__':
+    main()
