@@ -74,8 +74,8 @@ def process_change(change: dict, repo: Repository, gerrit_url: str):
                                f'**Link:** {change_url}\n' \
                                f'**Subject:** {change["subject"]}\n' \
                                f'**Authored By:** {change["owner"]["name"]} ({change["owner"]["email"]})'
-            if key == 'closes':
-                comment_msg += '\n\nThis change will close this issue when merged.'
+                if key == 'closes':
+                    comment_msg += '\n\nThis change will close this issue when merged.'
             if comment_msg:
                 LOG.debug(f'Comment to post on #{issue_number}: {comment_msg}')
                 issue.create_comment(comment_msg)

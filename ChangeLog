@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* Finalize changes for 0.0.1 build
 * Prepare project for packaging
 * Implement Relates-To and Closes tagging
 * Test and debug interactions
