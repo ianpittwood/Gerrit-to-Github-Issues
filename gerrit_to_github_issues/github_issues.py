@@ -54,6 +54,12 @@ def parse_issue_number(commit_msg: str) -> dict:
     }
 
 
+def remove_duplicated_issue_numbers(issue_dict: dict) -> dict:
+    if 'closes' in issue_dict:
+        issue_dict['related'] = [x for x in issue_dict['related'] if x not in issue_dict['closes']]
+    return issue_dict
+
+
 def get_repo(repo_name: str, github_user: str, github_pw: str, github_token: str) -> Repository:
     if github_token:
         gh = github.Github(github_token)

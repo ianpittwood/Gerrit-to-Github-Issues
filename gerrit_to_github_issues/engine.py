@@ -31,6 +31,7 @@ def update(gerrit_url: str, gerrit_project_name: str, github_project_name: str, 
 
 def process_change(change: dict, repo: Repository, gerrit_url: str):
     issue_numbers_dict = github_issues.parse_issue_number(change['commitMessage'])
+    issue_numbers_dict = github_issues.remove_duplicated_issue_numbers(issue_numbers_dict)
     if not issue_numbers_dict:
         LOG.warning(f'No issue tag found for change #{change["number"]}')
         return
