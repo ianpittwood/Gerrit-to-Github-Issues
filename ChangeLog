@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+* Fix deleted logging configuration call
+* Adds --log-file option to specify a file to log to
+* Add logic to remove issue numbers from 'related' that are duplicated in 'closed'
+* Release 0.0.2
 * Fix closes message to only be printed on new related changes
 * Finalize changes for 0.0.1 build
 * Prepare project for packaging
