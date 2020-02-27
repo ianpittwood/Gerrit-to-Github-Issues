@@ -1,0 +1,9 @@
+CHANGES
+=======
+
+* Prepare project for packaging
+* Implement Relates-To and Closes tagging
+* Test and debug interactions
+* Implement Gerrit change retrieval and processing
+* Add initial script implemented in a Zuul playbook
+* Initial commit

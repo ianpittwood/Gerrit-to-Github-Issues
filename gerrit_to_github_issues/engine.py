@@ -46,27 +46,27 @@ def process_change(change: dict, repo: Repository, gerrit_url: str):
             link_exists = github_issues.check_issue_for_matching_comments(issue, change_url)
             if issue.state == 'closed' and not link_exists:
                 LOG.debug(f'Issue #{issue_number} was closed, reopening...')
-                #issue.edit(state='open')
-                #issue.create_comment('Issue reopened due to new activity on Gerrit.\n\n')
+                issue.edit(state='open')
+                issue.create_comment('Issue reopened due to new activity on Gerrit.\n\n')
             labels = [str(l.name) for l in list(issue.get_labels())]
             if 'WIP' in change['commitMessage'] or 'DNM' in change['commitMessage']:
                 if 'wip' not in labels:
                     LOG.debug(f'add `wip` to #{issue_number}')
-                    #issue.add_to_labels('wip')
+                    issue.add_to_labels('wip')
                 if 'ready for review' in labels:
                     try:
                         LOG.debug(f'rm `ready for review` to #{issue_number}')
-                        #issue.remove_from_labels('ready for review')
+                        issue.remove_from_labels('ready for review')
                     except github.GithubException:
                         LOG.debug(f'`ready for review` tag does not exist on issue #{issue_number}')
             else:
                 if 'ready for review' not in labels:
                     LOG.debug(f'add `ready for review` to #{issue_number}')
-                    #issue.add_to_labels('ready for review')
+                    issue.add_to_labels('ready for review')
                 if 'wip' in labels:
                     try:
                         LOG.debug(f'rm `wip` to #{issue_number}')
-                        #issue.remove_from_labels('wip')
+                        issue.remove_from_labels('wip')
                     except github.GithubException:
                         LOG.debug(f'`wip` tag does not exist on issue #{issue_number}')
             if not link_exists:
@@ -78,5 +78,5 @@ def process_change(change: dict, repo: Repository, gerrit_url: str):
                 comment_msg += '\n\nThis change will close this issue when merged.'
             if comment_msg:
                 LOG.debug(f'Comment to post on #{issue_number}: {comment_msg}')
-                #issue.create_comment(comment_msg)
+                issue.create_comment(comment_msg)
                 LOG.info(f'Comment posted to issue #{issue_number}')
