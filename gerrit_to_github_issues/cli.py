@@ -80,4 +80,5 @@ def main():
         log_settings['filename'] = log_file
     else:
         log_settings['stream'] = sys.stdout
+    logging.basicConfig(**log_settings)
     update(**args)
