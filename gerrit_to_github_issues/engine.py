@@ -21,9 +21,9 @@ LOG = logging.getLogger(__name__)
 
 
 def update(gerrit_url: str, gerrit_project_name: str, github_project_name: str, github_user: str, github_password: str,
-           github_token: str):
+           github_token: str, change_age: str = None):
     repo = github_issues.get_repo(github_project_name, github_user, github_password, github_token)
-    change_list = gerrit.get_changes(gerrit_url, gerrit_project_name)
+    change_list = gerrit.get_changes(gerrit_url, gerrit_project_name, change_age=change_age)
     for change in change_list['data']:
         if 'commitMessage' in change:
             process_change(change, repo, gerrit_url)

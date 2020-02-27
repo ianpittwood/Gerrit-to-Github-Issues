@@ -47,6 +47,11 @@ def main():
     )
     parser.add_argument('-g', '--gerrit-url', action='store', required=True, type=str,
                         default=os.getenv('GERRIT_URL', default=None), help='Target Gerrit URL.')
+    parser.add_argument('-a', '--change-age', action='store', required=False, type=str,
+                        default=None,
+                        help='Specifies how far in the past to search for changes in Gerrit. '
+                             'See https://gerrit-review.googlesource.com/Documentation/user-search.html#age for more '
+                             'details.')
     parser.add_argument('-u', '--github-user', action='store', required=False, type=str,
                         default=os.getenv('GITHUB_USER', default=None),
                         help='Username to use for GitHub Issues integration. Defaults to GITHUB_USER in '
