@@ -14,6 +14,7 @@ import re
 
 import github
 from github.Issue import Issue
+from github.IssueComment import IssueComment
 from github.Repository import Repository
 
 from gerrit_to_github_issues import errors
@@ -75,3 +76,9 @@ def check_issue_for_matching_comments(issue: Issue, contains: str) -> bool:
         if contains in comment.body:
             return True
     return False
+
+
+def get_bot_comment(issue: Issue, bot_name: str, ps_number: str) -> IssueComment:
+    for i in issue.get_comments():
+        if i.user.login == bot_name and ps_number in i.body:
+            return i

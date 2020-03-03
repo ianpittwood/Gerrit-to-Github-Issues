@@ -71,7 +71,7 @@ def process_change(change: dict, repo: Repository, gerrit_url: str):
                     except github.GithubException:
                         LOG.debug(f'`wip` tag does not exist on issue #{issue_number}')
             if not link_exists:
-                comment_msg += '### New Related Change\n\n' \
+                comment_msg += f'## Related Change #{change["number"]}\n\n' \
                                f'**Link:** {change_url}\n' \
                                f'**Subject:** {change["subject"]}\n' \
                                f'**Authored By:** {change["owner"]["name"]} ({change["owner"]["email"]})'
