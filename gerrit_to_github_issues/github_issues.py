@@ -61,21 +61,14 @@ def remove_duplicated_issue_numbers(issue_dict: dict) -> dict:
     return issue_dict
 
 
-def get_repo(repo_name: str, github_user: str, github_pw: str, github_token: str) -> Repository:
+def get_repo(repo_name: str, github_user: str, github_pw: str, github_token: str) -> (github.Github, Repository):
     if github_token:
         gh = github.Github(github_token)
     elif github_user and github_pw:
         gh = github.Github(github_user, github_pw)
     else:
         raise errors.GithubConfigurationError
-    return gh.get_repo(repo_name)
-
-
-def check_issue_for_matching_comments(issue: Issue, contains: str) -> bool:
-    for comment in issue.get_comments():
-        if contains in comment.body:
-            return True
-    return False
+    return gh, gh.get_repo(repo_name)
 
 
 def get_bot_comment(issue: Issue, bot_name: str, ps_number: str) -> IssueComment:
