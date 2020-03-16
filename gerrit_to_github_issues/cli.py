@@ -52,6 +52,8 @@ def main():
                         help='Specifies how far in the past to search for changes in Gerrit. '
                              'See https://gerrit-review.googlesource.com/Documentation/user-search.html#age for more '
                              'details.')
+    parser.add_argument('--skip-approvals', action='store_true', required=False, default=False,
+                        help='Skips evaluation of change approvals to be written to the bot comments.')
     parser.add_argument('-u', '--github-user', action='store', required=False, type=str,
                         default=os.getenv('GITHUB_USER', default=None),
                         help='Username to use for GitHub Issues integration. Defaults to GITHUB_USER in '
