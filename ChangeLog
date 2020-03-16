@@ -1,6 +1,9 @@
 CHANGES
 =======
 
+* Implements evaluation and posting of change approvals on issues (#1)
+* Add parameter to set a limit on the age of changes looked back at
+* Release 0.0.3
 * Fix deleted logging configuration call
 * Adds --log-file option to specify a file to log to
 * Add logic to remove issue numbers from 'related' that are duplicated in 'closed'
