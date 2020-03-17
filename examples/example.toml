@@ -1,0 +1,40 @@
+title = "Example Gerrit/Github Integration Configuration"
+
+[owner]
+name = "Ian H. Pittwood"
+email = "pittwoodian@gmail.com"
+
+[gerrit]
+# Required
+url = "review.opendev.org"
+port = 29418
+project = "airship/airshipctl"
+change_age = "15m"  # How far to look back when querying changes
+
+[gerrit.optional]
+# Optional arguments or options to add to the gerrit query
+query_args = ""  # Additional query arguments appended to the project arg literally
+query_opts = ""  # Additional `gerrit query` command options literally applied
+
+[github]
+project = "airshipit/airshipctl"
+
+# Optional ways to specify github authentication method
+# Any of these can be specified at the commandline or via env vars as well
+username = ""
+password = ""
+token = ""
+
+[github.issues]
+comment_template = ""  # Inline comment template
+comment_template_file = "example.j2.txt"  # Path to a file with the template
+
+[github.issues.labeling]
+# Rule definition for labeling
+wip.keyword = "WIP,DNM"  # Keywords can be comma separated terms to search for
+wip.add = "wip"  # Comma separated labels to add
+wip.remove = "ready for review"  # Comma separated labels to remove
+
+# Rule applied when no keyword labels are found
+default.add = "ready for review"
+default.remove = "wip"

@@ -1,0 +1,26 @@
+## Related Change [{{ change["number"] }}]({{ change["url"] }})
+
+**Subject:** {{ change["subject"] }}
+**Link:** {{ change["url"] }}
+**Status:** MERGED
+**Owner:** Sreejith Punnapuzha (Sreejith.Punnapuzha@outlook.com)
+
+### Approvals
+```diff
+{% for key in approval_types %}
+{{ key }}
+{% if approval_dict[key] %}
+{% for approval in approval_dict[key] %}
+{% if approval[1]|int > 0 %}
++{{ approval[1] }} {{ approval[0] }}
+{% else %}
+{{ approval[1] }} {{ approval[0] }}
+{% endif %}
+{% endfor %}
+{% else %}
+! None
+{% endif %}
+{% endfor %}
+```
+
+*Last Updated: {{ time_str }}*
