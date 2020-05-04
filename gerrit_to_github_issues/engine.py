@@ -135,7 +135,7 @@ def get_issue_comment(change: dict, key: str, skip_approvals: bool = False) -> s
     return comment_str
 
 
-def move_issue(project_board, issue, to_col_name):
+def move_issue(project_board: Project, issue: Issue, to_col_name: str):
     for col in project_board.get_columns():
         if col.name == to_col_name:
             to_col = col
