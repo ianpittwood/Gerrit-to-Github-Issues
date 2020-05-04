@@ -153,6 +153,6 @@ def move_issue(project_board: Project, issue: Issue, to_col_name: str):
         return
 
     if card.move("top", to_col):
-        LOG.info('Moved issue "{issue.name}" to column "{to_col_name}"')
+        LOG.info(f'Moved issue "{issue.name}" to column "{to_col_name}"')
     else:
-        LOG.warning('Failed to move issue "{issue.name}" to column "{to_col_name}"')
+        LOG.warning(f'Failed to move issue "{issue.name}" to column "{to_col_name}"')
