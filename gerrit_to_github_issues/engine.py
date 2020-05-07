@@ -30,6 +30,9 @@ def update(gerrit_url: str, gerrit_project_name: str, github_project_name: str, 
         if 'commitMessage' in change:
             process_change(gh, change, repo, skip_approvals)
 
+    # Handle the incoming issue assignment requests
+    github_issues.assign_issues(repo)
+
 
 def process_change(gh: github.Github, change: dict, repo: Repository, skip_approvals: bool = False):
     issue_numbers_dict = github_issues.parse_issue_number(change['commitMessage'])
