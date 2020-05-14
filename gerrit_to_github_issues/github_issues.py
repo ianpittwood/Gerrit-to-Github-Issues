@@ -87,7 +87,7 @@ def try_assign(issue):
     # find the most recent assignment request
     assignment_request = None
     for comment in issue.get_comments().reversed:
-        if comment.body == '/assign':
+        if '/assign' in comment.body:
             assignment_request = comment
             break
     if not assignment_request:
