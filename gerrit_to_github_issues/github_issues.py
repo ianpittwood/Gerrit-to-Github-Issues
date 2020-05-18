@@ -9,6 +9,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from datetime import datetime
 import logging
 import re
 
@@ -77,13 +78,13 @@ def get_bot_comment(issue: Issue, bot_name: str, ps_number: str) -> IssueComment
             return i
 
 
-def assign_issues(repo)
+def assign_issues(repo: github.Repository):
     open_issues = [i for i in repo.get_issues() if i.state == 'open']
     for issue in open_issues:
         try_assign(issue)
 
 
-def try_assign(issue):
+def try_assign(issue: github.Issue):
     # find the most recent assignment request
     assignment_request = None
     for comment in issue.get_comments().reversed:
@@ -108,8 +109,8 @@ def try_assign(issue):
         for assignee in old_assignees:
             issue.remove_from_assignees(assignee)
         issue.add_to_assignees(assignment_request.user)
-        comment_body = f'unassigned: {", ".join([a for a in old_assinees])}\n' + \
-                       f'assigned {assignment_request.user.login}'
+        comment_body = f'unassigned: {", ".join([a for a in old_assignees])}\n' + \
+                       f'assigned: {assignment_request.user.login}'
         issue.create_comment(comment_body)
         return
 
@@ -118,7 +119,7 @@ def try_assign(issue):
     # handle the conflict.
     comment_body = f'Unable to assign {assignment_request.user.login}. Please ' + \
                    f'contact a member of the @airshipit/airship-cores team for ' + \
-                   f'help with assignments'
+                   f'help with assignments.'
     issue.create_comment(comment_body)
 
 
