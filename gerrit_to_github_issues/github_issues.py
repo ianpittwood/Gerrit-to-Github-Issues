@@ -100,15 +100,15 @@ def try_assign(issue):
         issue.create_comment(f'assigned {assignment_request.user.login}')
         return
 
-    if issue_age(issue) > 60:
-        # If the issue is 2 months old and the original assignees haven't
+    if issue_age(issue) > 30:
+        # If the issue is 1 months old and the original assignees haven't
         # closed it yet, let's assume that they've stopped working on it and
         # allow the new user to have this issue
         old_assignees = issue.assignees
         for assignee in old_assignees:
             issue.remove_from_assignees(assignee)
         issue.add_to_assignees(assignment_request.user)
-        comment_body = f'unassigned: {", ".join([a for a in old_assinees])}\n' +
+        comment_body = f'unassigned: {", ".join([a for a in old_assinees])}\n' + \
                        f'assigned {assignment_request.user.login}'
         issue.create_comment(comment_body)
         return
@@ -116,8 +116,8 @@ def try_assign(issue):
     # If we've made it here, a user has requested to be assigned to a non-stale
     # issue which is already assigned. Just notify the core team and let them
     # handle the conflict.
-    comment_body = f'Unable to assign {assignment_request.user.login}. Please '+
-                   f'contact a member of the @airshipit/airship-cores team for '
+    comment_body = f'Unable to assign {assignment_request.user.login}. Please ' + \
+                   f'contact a member of the @airshipit/airship-cores team for ' + \
                    f'help with assignments'
     issue.create_comment(comment_body)
 
