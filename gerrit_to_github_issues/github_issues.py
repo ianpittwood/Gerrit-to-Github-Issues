@@ -15,7 +15,6 @@ import re
 import github
 from github.Issue import Issue
 from github.IssueComment import IssueComment
-from github.Repository import Repository
 
 from gerrit_to_github_issues import errors
 
@@ -61,13 +60,14 @@ def remove_duplicated_issue_numbers(issue_dict: dict) -> dict:
     return issue_dict
 
 
-def get_client(github_user: str, github_pw: str, github_token: str) -> github.Github
+def get_client(github_user: str, github_pw: str, github_token: str) -> github.Github:
     if github_token:
-        gh = github.Github(github_token)
-    elif github_user and github_pw:
-        gh = github.Github(github_user, github_pw)
-    else:
-        raise errors.GithubConfigurationError
+        return github.Github(github_token)
+
+    if github_user and github_pw:
+        return github.Github(github_user, github_pw)
+
+    raise errors.GithubConfigurationError
 
 
 def get_bot_comment(issue: Issue, bot_name: str, ps_number: str) -> IssueComment:

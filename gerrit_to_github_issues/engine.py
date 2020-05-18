@@ -24,19 +24,20 @@ from gerrit_to_github_issues import github_issues
 LOG = logging.getLogger(__name__)
 
 
-def update(gerrit_url: str, gerrit_project_name: str, github_project_id: int,
+def update(gerrit_url: str, gerrit_repo_name: str, github_project_id: int,
            github_repo_name: str, github_user: str, github_password: str, github_token: str,
            change_age: str = None, skip_approvals: bool = False):
     gh = github_issues.get_client(github_user, github_password, github_token)
     repo = gh.get_repo(github_repo_name)
     project_board = gh.get_project(github_project_id)
-    change_list = gerrit.get_changes(gerrit_url, gerrit_project_name, change_age=change_age)
+    change_list = gerrit.get_changes(gerrit_url, gerrit_repo_name, change_age=change_age)
     for change in change_list['data']:
         if 'commitMessage' in change:
             process_change(gh, change, repo, project_board, skip_approvals)
 
 
-def process_change(gh: github.Github, change: dict, repo: Repository, project_board: Project, skip_approvals: bool = False):
+def process_change(gh: github.Github, change: dict, repo: Repository,
+                   project_board: Project, skip_approvals: bool = False):
     issue_numbers_dict = github_issues.parse_issue_number(change['commitMessage'])
     issue_numbers_dict = github_issues.remove_duplicated_issue_numbers(issue_numbers_dict)
     if not issue_numbers_dict:
@@ -136,6 +137,7 @@ def get_issue_comment(change: dict, key: str, skip_approvals: bool = False) -> s
 
 
 def move_issue(project_board: Project, issue: Issue, to_col_name: str):
+    to_col, card = None, None
     for col in project_board.get_columns():
         if col.name == to_col_name:
             to_col = col
