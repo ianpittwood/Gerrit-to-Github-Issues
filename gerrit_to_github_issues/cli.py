@@ -39,10 +39,12 @@ def main():
                     '2. Check associated Github Issue for a link to the change. If no such link exists, comment it.\n'
                     '3. If the associated issue was closed, re-open it and comment on it describing why it was '
                     're-opened and a link to the Gerrit change that was found.\n'
-                    '4. If the Gerrit change\'s commit message contains a "WIP" or "DNM" tag, add the "wip" label and '
-                    'to the issue remove other process labels such as "ready for review".\n'
+                    '4. If the Gerrit change\'s commit message contains a "WIP" or "DNM" tag, add the "wip" label '
+                    'to the issue, remove other process labels (e.g. "ready for review"), and move the issue '
+                    'to the "In Progress" column of the project board.\n'
                     '5. If no "WIP" or "DNM" tag is found in the change\'s commit message, add the "ready for review" '
-                    'label to the issue and remove other process labels such as "ready for review".',
+                    'label to the issue, remove other process labels (e.g "wip"), and move the issue '
+                    'to the "Submitted on Gerrit" column of the project board.',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument('-g', '--gerrit-url', action='store', required=True, type=str,
@@ -70,8 +72,9 @@ def main():
                         default=False, help='Enabled DEBUG level logging.')
     parser.add_argument('--log-file', action='store', required=False, type=str,
                         help='Specifies a file to output logs to. Defaults to `sys.stdout`.')
-    parser.add_argument('gerrit_project_name', action='store', type=str, help='Target Gerrit project.')
-    parser.add_argument('github_project_name', action='store', type=str, help='Target Github project.')
+    parser.add_argument('gerrit_repo_name', action='store', type=str, help='Target Gerrit repo.')
+    parser.add_argument('github_repo_name', action='store', type=str, help='Target Github repo.')
+    parser.add_argument('github_project_id', action='store', type=int, help='Target Github project board ID.')
     ns = parser.parse_args()
     args = validate(ns)
     verbose = args.pop('verbose')
