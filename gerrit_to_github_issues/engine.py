@@ -31,9 +31,8 @@ def update(gerrit_url: str, gerrit_repo_name: str, github_project_id: int,
     repo = gh.get_repo(github_repo_name)
     project_board = gh.get_project(github_project_id)
     change_list = gerrit.get_changes(gerrit_url, gerrit_repo_name, change_age=change_age)
-    for change in change_list['data']:
-        if 'commitMessage' in change:
-            process_change(gh, change, repo, project_board, skip_approvals)
+    for change in change_list:
+        process_change(gh, change, repo, project_board, skip_approvals)
 
     # Handle the incoming issue assignment requests
     github_issues.assign_issues(repo)

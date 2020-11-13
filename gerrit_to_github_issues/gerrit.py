@@ -14,14 +14,15 @@ import json
 from fabric import Connection
 
 
-def get_changes(gerrit_url: str, project_name: str, port: int = 29418, change_age: str = None) -> dict:
+def get_changes(gerrit_url: str, project_name: str, port: int = 29418, change_age: str = None) -> list:
     cmd = f'gerrit query --format=JSON --current-patch-set project:{project_name}'
     if change_age:
         cmd += f' -- -age:{change_age}'
     result = Connection(gerrit_url, port=port).run(cmd)
     processed_stdout = '{"data":[%s]}' % ','.join(list(filter(None, result.stdout.split('\n'))))
     data = json.loads(processed_stdout)
-    return data
+    changes = [c for c in data['data'] if 'commitMessage' in c]
+    return changes
 
 
 def make_gerrit_url(gerrit_url: str, change_number: str, protocol: str = 'https'):
